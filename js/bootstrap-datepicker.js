@@ -40,6 +40,7 @@
 							});
 		this.isInput = this.element.is('input');
 		this.component = this.element.is('.date') ? this.element.find('.add-on') : false;
+		this.hasInput = this.component && this.element.find('input').length;
 		if(this.component && this.component.length === 0)
 			this.component = false;
 
@@ -50,7 +51,7 @@
 				keydown: $.proxy(this.keydown, this)
 			});
 		} else {
-			if (this.component){
+			if (this.component && hasInput){
 				// For components that are not readonly, allow keyboard nav
 				this.element.find('input').on({
 					focus: $.proxy(this.show, this),
@@ -66,7 +67,7 @@
 
 		$(document).on('mousedown', function (e) {
 			// Clicked outside the datepicker, hide it
-			if ($(e.target).closest('.datepicker').length == 0) {
+			if ($(e.target).closest('.datepicker').length === 0) {
 				that.hide();
 			}
 		});
@@ -122,10 +123,10 @@
 			this.update();
 			this.place();
 			$(window).on('resize', $.proxy(this.place, this));
-			if (e ) {
+			if (e) {
 				e.preventDefault();
 			}
-			if (!this.isInput) {
+			if (!this.isInput && this.hasInput) {
 				$(document).on('mousedown', $.proxy(this.hide, this));
 			}
 			this.element.trigger({
@@ -341,6 +342,7 @@
 
 		click: function(e) {
 			e.preventDefault();
+			e.stopPropagation();
 			var target = $(e.target).closest('span, td, th');
 			if (target.length == 1) {
 				switch(target[0].nodeName.toLowerCase()) {
@@ -482,6 +484,7 @@
 		},
 
 		keydown: function(e){
+			e.stopPropagation();
 			if (this.picker.is(':not(:visible)')){
 				if (e.keyCode == 27) // allow escape to hide and re-show picker
 					this.show();
